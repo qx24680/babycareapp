@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:babycare/services/database_service.dart'; // Import to ensure init logic runs
+// Import to ensure init logic runs
 import 'package:babycare/services/chat_repository.dart';
 import 'package:babycare/models/chat_message.dart';
 

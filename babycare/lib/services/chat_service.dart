@@ -1,6 +1,5 @@
 import 'dart:async';
 import '../models/chat_message.dart';
-import '../models/baby_profile.dart';
 import '../services/chat_repository.dart';
 import '../services/baby_repository.dart';
 import '../services/gemini_service.dart';

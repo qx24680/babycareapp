@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:babycare/services/baby_repository.dart';
 import 'package:babycare/models/baby_profile.dart';
 import 'package:babycare/models/activity_log.dart';
