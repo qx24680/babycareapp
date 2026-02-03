@@ -3,6 +3,7 @@ import 'dart:convert';
 class ActivityLog {
   final int? id;
   final int babyId;
+  final int? userId; // Who logged this activity
   final String activityType;
   final DateTime startTime; // Used for singular events too
   final DateTime? endTime; // Optional for duration-based events
@@ -11,6 +12,7 @@ class ActivityLog {
   ActivityLog({
     this.id,
     required this.babyId,
+    this.userId,
     required this.activityType,
     required this.startTime,
     this.endTime,
@@ -21,6 +23,7 @@ class ActivityLog {
     return {
       'id': id,
       'baby_id': babyId,
+      'user_id': userId,
       'activity_type': activityType,
       'start_time': startTime.toIso8601String(),
       'end_time': endTime?.toIso8601String(),
@@ -32,6 +35,7 @@ class ActivityLog {
     return ActivityLog(
       id: map['id'] as int?,
       babyId: map['baby_id'] as int,
+      userId: map['user_id'] as int?,
       activityType: map['activity_type'] as String,
       startTime: DateTime.parse(map['start_time'] as String),
       endTime: map['end_time'] != null

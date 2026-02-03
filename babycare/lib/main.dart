@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'core/theme/app_theme.dart';
-import 'screens/home_screen.dart';
+import 'screens/login_screen.dart';
 
+// await dotenv.load(fileName: ".env");
 void main() {
   runApp(const MyApp());
 }
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
     return CupertinoApp(
       title: 'BabyCare',
       theme: AppTheme.theme,
-      home: const HomeScreen(title: 'BabyCare Home'),
+      home: const LoginScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

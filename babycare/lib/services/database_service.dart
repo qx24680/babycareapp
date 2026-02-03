@@ -21,7 +21,7 @@ class DatabaseService {
     String path = join(await getDatabasesPath(), 'babycare_mvp.db');
     return await openDatabase(
       path,
-      version: 2, // Bump version
+      version: 4, // Bump version for user_id in activity_log
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
@@ -60,9 +60,51 @@ class DatabaseService {
         'CREATE INDEX idx_chat_message_conversation ON chat_message (conversation_id)',
       );
     }
+
+    if (oldVersion < 3) {
+      // Migration for Version 3: User Authentication
+      await db.execute('''
+        CREATE TABLE user (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          email TEXT NOT NULL UNIQUE,
+          password_hash TEXT NOT NULL,
+          full_name TEXT NOT NULL,
+          phone_number TEXT,
+          created_at TEXT NOT NULL
+        )
+      ''');
+
+      await db.execute(
+        'CREATE INDEX idx_user_email ON user (email)',
+      );
+    }
+
+    if (oldVersion < 4) {
+      // Migration for Version 4: Add user_id to activity_log
+      await db.execute('ALTER TABLE activity_log ADD COLUMN user_id INTEGER');
+      await db.execute(
+        'CREATE INDEX idx_activity_log_user ON activity_log (user_id)',
+      );
+    }
   }
 
   Future<void> _createDB(Database db, int version) async {
+    // User table for authentication
+    await db.execute('''
+      CREATE TABLE user (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT NOT NULL UNIQUE,
+        password_hash TEXT NOT NULL,
+        full_name TEXT NOT NULL,
+        phone_number TEXT,
+        created_at TEXT NOT NULL
+      )
+    ''');
+
+    await db.execute(
+      'CREATE INDEX idx_user_email ON user (email)',
+    );
+
     await db.execute('''
       CREATE TABLE baby_profile (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -90,11 +132,13 @@ class DatabaseService {
       CREATE TABLE activity_log (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         baby_id INTEGER NOT NULL,
+        user_id INTEGER,
         activity_type TEXT NOT NULL,
         start_time TEXT NOT NULL,
         end_time TEXT,
         details TEXT,
-        FOREIGN KEY (baby_id) REFERENCES baby_profile (id) ON DELETE CASCADE
+        FOREIGN KEY (baby_id) REFERENCES baby_profile (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE SET NULL
       )
     ''');
 
