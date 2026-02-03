@@ -26,25 +26,57 @@ class AppRadius {
 class AppShadows {
   static final List<BoxShadow> sm = [
     BoxShadow(
-      color: AppColors.text.withValues(alpha: 0.05),
+      color: AppColors.primary.withValues(alpha: 0.15),
       offset: const Offset(0, 2),
-      blurRadius: 4,
+      blurRadius: 8,
+      spreadRadius: 0,
+    ),
+    BoxShadow(
+      color: CupertinoColors.black.withValues(alpha: 0.05),
+      offset: const Offset(0, 1),
+      blurRadius: 3,
     ),
   ];
 
   static final List<BoxShadow> md = [
     BoxShadow(
-      color: AppColors.text.withValues(alpha: 0.08),
+      color: AppColors.primary.withValues(alpha: 0.2),
       offset: const Offset(0, 4),
-      blurRadius: 8,
+      blurRadius: 12,
+      spreadRadius: 0,
+    ),
+    BoxShadow(
+      color: CupertinoColors.black.withValues(alpha: 0.08),
+      offset: const Offset(0, 2),
+      blurRadius: 6,
     ),
   ];
 
   static final List<BoxShadow> lg = [
     BoxShadow(
-      color: AppColors.text.withValues(alpha: 0.12),
+      color: AppColors.primary.withValues(alpha: 0.25),
       offset: const Offset(0, 8),
-      blurRadius: 16,
+      blurRadius: 24,
+      spreadRadius: -4,
+    ),
+    BoxShadow(
+      color: CupertinoColors.black.withValues(alpha: 0.12),
+      offset: const Offset(0, 4),
+      blurRadius: 12,
+    ),
+  ];
+
+  static final List<BoxShadow> card = [
+    BoxShadow(
+      color: AppColors.primary.withValues(alpha: 0.12),
+      offset: const Offset(0, 2),
+      blurRadius: 10,
+      spreadRadius: 0,
+    ),
+    BoxShadow(
+      color: CupertinoColors.black.withValues(alpha: 0.05),
+      offset: const Offset(0, 1),
+      blurRadius: 4,
     ),
   ];
 }

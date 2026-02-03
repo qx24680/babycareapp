@@ -23,6 +23,7 @@ class _HealthFormState extends State<HealthForm> {
   int severity = 5;
   String medication = '';
   String dosage = '';
+  DateTime selectedDateTime = DateTime.now();
   final _notesController = TextEditingController();
 
   @override
@@ -53,6 +54,7 @@ class _HealthFormState extends State<HealthForm> {
     widget.onSubmit(
       activityType: ActivityTypes.health,
       metadata: metadata,
+      startTime: selectedDateTime,
     );
   }
 
@@ -95,6 +97,39 @@ class _HealthFormState extends State<HealthForm> {
             _buildMedicationFields(),
           ],
 
+          const SizedBox(height: AppSpacing.lg),
+
+          // Date & Time Picker
+          const Text('Date & Time', style: AppTypography.h3),
+          const SizedBox(height: AppSpacing.sm),
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            decoration: BoxDecoration(
+              color: CupertinoColors.white,
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              boxShadow: AppShadows.sm,
+            ),
+            child: Column(
+              children: [
+                Text(
+                  '${selectedDateTime.day}/${selectedDateTime.month}/${selectedDateTime.year} ${selectedDateTime.hour}:${selectedDateTime.minute.toString().padLeft(2, '0')}',
+                  style: AppTypography.body.copyWith(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                SizedBox(
+                  height: 150,
+                  child: CupertinoDatePicker(
+                    mode: CupertinoDatePickerMode.dateAndTime,
+                    initialDateTime: selectedDateTime,
+                    maximumDate: DateTime.now(),
+                    onDateTimeChanged: (newDateTime) {
+                      setState(() => selectedDateTime = newDateTime);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
           const SizedBox(height: AppSpacing.lg),
 
           // Notes

@@ -104,7 +104,7 @@ class _SleepFormState extends State<SleepForm> {
                     ),
                     CupertinoSwitch(
                       value: endTime != null,
-                      activeColor: AppColors.primary,
+                      activeTrackColor: AppColors.primary,
                       onChanged: (value) {
                         setState(() {
                           endTime = value ? DateTime.now() : null;

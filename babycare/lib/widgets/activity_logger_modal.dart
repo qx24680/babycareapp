@@ -45,11 +45,20 @@ class _ActivityLoggerModalState extends State<ActivityLoggerModal> {
     DateTime? startTime,
     DateTime? endTime,
   }) async {
+    final timestamp = startTime ?? DateTime.now();
+    
+    // Check for conflicting activities
+    if (await _hasConflictingActivity(activityType, timestamp)) {
+      if (!mounted) return;
+      _showConflictDialog();
+      return;
+    }
+
     final activity = ActivityLog(
       babyId: widget.babyId,
       userId: widget.userId,
       activityType: activityType,
-      startTime: startTime ?? DateTime.now(),
+      startTime: timestamp,
       endTime: endTime,
       details: jsonEncode(metadata),
     );
@@ -60,6 +69,66 @@ class _ActivityLoggerModalState extends State<ActivityLoggerModal> {
     
     widget.onActivityLogged();
     Navigator.of(context).pop();
+  }
+
+  Future<bool> _hasConflictingActivity(String activityType, DateTime timestamp) async {
+    try {
+      final date = DateTime(timestamp.year, timestamp.month, timestamp.day);
+      final existingLogs = await _repository.getDailyLogs(widget.babyId, date);
+      
+      // Define conflicting activity pairs
+      final conflicts = <String, List<String>>{
+        ActivityTypes.feeding: [ActivityTypes.sleep],
+        ActivityTypes.sleep: [ActivityTypes.feeding, ActivityTypes.activity],
+        ActivityTypes.activity: [ActivityTypes.sleep],
+      };
+
+      final conflictingTypes = conflicts[activityType] ?? [];
+      
+      // Check if there's an activity at the exact same minute that conflicts
+      return existingLogs.any((log) {
+        if (!conflictingTypes.contains(log.activityType)) return false;
+        
+        // Check if timestamps are within the same minute
+        final logMinute = DateTime(
+          log.startTime.year,
+          log.startTime.month,
+          log.startTime.day,
+          log.startTime.hour,
+          log.startTime.minute,
+        );
+        final newMinute = DateTime(
+          timestamp.year,
+          timestamp.month,
+          timestamp.day,
+          timestamp.hour,
+          timestamp.minute,
+        );
+        
+        return logMinute == newMinute;
+      });
+    } catch (e) {
+      return false;
+    }
+  }
+
+  void _showConflictDialog() {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('Conflicting Activity'),
+        content: const Text(
+          'An activity that cannot occur at the same time is already logged for this minute. '
+          'Please choose a different time or edit the existing activity.',
+        ),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('OK'),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -125,9 +194,20 @@ class _ActivityLoggerModalState extends State<ActivityLoggerModal> {
       onTap: () => _selectActivityType(config.type),
       child: Container(
         decoration: BoxDecoration(
-          color: CupertinoColors.white,
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              CupertinoColors.white,
+              config.lightColor.withValues(alpha: 0.3),
+            ],
+          ),
           borderRadius: BorderRadius.circular(AppRadius.md),
-          boxShadow: AppShadows.sm,
+          boxShadow: AppShadows.card,
+          border: Border.all(
+            color: config.color.withValues(alpha: 0.2),
+            width: 1,
+          ),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -136,8 +216,22 @@ class _ActivityLoggerModalState extends State<ActivityLoggerModal> {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: config.lightColor,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    config.lightColor,
+                    config.color.withValues(alpha: 0.3),
+                  ],
+                ),
                 borderRadius: BorderRadius.circular(AppRadius.md),
+                boxShadow: [
+                  BoxShadow(
+                    color: config.color.withValues(alpha: 0.2),
+                    offset: const Offset(0, 2),
+                    blurRadius: 6,
+                  ),
+                ],
               ),
               child: Icon(
                 config.icon,
@@ -150,6 +244,7 @@ class _ActivityLoggerModalState extends State<ActivityLoggerModal> {
               config.label,
               style: AppTypography.bodySmall.copyWith(
                 fontWeight: FontWeight.w600,
+                color: AppColors.text,
               ),
               textAlign: TextAlign.center,
             ),

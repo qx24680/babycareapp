@@ -121,9 +121,23 @@ class TimelineFeed extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: config.lightColor,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      config.lightColor,
+                      config.color.withValues(alpha: 0.3),
+                    ],
+                  ),
                   borderRadius: BorderRadius.circular(AppRadius.sm),
                   border: Border.all(color: config.color, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: config.color.withValues(alpha: 0.2),
+                      offset: const Offset(0, 2),
+                      blurRadius: 6,
+                    ),
+                  ],
                 ),
                 child: Icon(config.icon, color: config.color, size: 20),
               ),
@@ -150,59 +164,159 @@ class TimelineFeed extends StatelessWidget {
           // Activity card
           Expanded(
             child: Container(
-              padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: CupertinoColors.white,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    CupertinoColors.white,
+                    config.lightColor.withValues(alpha: 0.3),
+                  ],
+                ),
                 borderRadius: BorderRadius.circular(AppRadius.md),
-                boxShadow: AppShadows.sm,
-                border: Border(
-                  left: BorderSide(color: config.color, width: 3),
+                boxShadow: AppShadows.card,
+                border: Border.all(
+                  color: config.color.withValues(alpha: 0.3),
+                  width: 1,
                 ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Stack(
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          _getActivityTitle(activity, metadata),
+                  // Left accent bar
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    child: Container(
+                      width: 4,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            config.color,
+                            config.color.withValues(alpha: 0.5),
+                          ],
+                        ),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(AppRadius.md),
+                          bottomLeft: Radius.circular(AppRadius.md),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Content
+                  Padding(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.sm,
+                                vertical: AppSpacing.xs,
+                              ),
+                              decoration: BoxDecoration(
+                                color: config.lightColor,
+                                borderRadius: BorderRadius.circular(AppRadius.sm),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    config.icon,
+                                    size: 14,
+                                    color: config.color,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    _getActivityTitle(activity, metadata),
+                                    style: AppTypography.bodySmall.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                      color: config.color,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Spacer(),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.sm,
+                                vertical: AppSpacing.xs,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.text.withValues(alpha: 0.05),
+                                borderRadius: BorderRadius.circular(AppRadius.sm),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    CupertinoIcons.clock,
+                                    size: 12,
+                                    color: AppColors.text.withValues(alpha: 0.6),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    DateFormat('h:mm a').format(activity.startTime),
+                                    style: AppTypography.caption.copyWith(
+                                      color: AppColors.text.withValues(alpha: 0.7),
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          _getActivitySubtext(activity, metadata),
                           style: AppTypography.body.copyWith(
-                            fontWeight: FontWeight.w600,
+                            color: AppColors.text.withValues(alpha: 0.8),
+                            height: 1.4,
                           ),
                         ),
-                      ),
-                      Text(
-                        DateFormat('h:mm a').format(activity.startTime),
-                        style: AppTypography.caption.copyWith(
-                          color: AppColors.text.withValues(alpha: 0.6),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    _getActivitySubtext(activity, metadata),
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.text.withValues(alpha: 0.7),
+                        if (metadata.containsKey('notes')) ...[
+                          const SizedBox(height: AppSpacing.sm),
+                          Container(
+                            padding: const EdgeInsets.all(AppSpacing.sm),
+                            decoration: BoxDecoration(
+                              color: CupertinoColors.white,
+                              borderRadius: BorderRadius.circular(AppRadius.sm),
+                              border: Border.all(
+                                color: AppColors.text.withValues(alpha: 0.1),
+                              ),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  CupertinoIcons.doc_text,
+                                  size: 14,
+                                  color: AppColors.text.withValues(alpha: 0.5),
+                                ),
+                                const SizedBox(width: AppSpacing.xs),
+                                Expanded(
+                                  child: Text(
+                                    metadata['notes'],
+                                    style: AppTypography.bodySmall.copyWith(
+                                      fontStyle: FontStyle.italic,
+                                      color: AppColors.text.withValues(alpha: 0.7),
+                                      height: 1.3,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
-                  if (metadata.containsKey('notes')) ...[
-                    const SizedBox(height: AppSpacing.sm),
-                    Container(
-                      padding: const EdgeInsets.all(AppSpacing.sm),
-                      decoration: BoxDecoration(
-                        color: AppColors.background,
-                        borderRadius: BorderRadius.circular(AppRadius.sm),
-                      ),
-                      child: Text(
-                        metadata['notes'],
-                        style: AppTypography.bodySmall.copyWith(
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ),
-                  ],
                 ],
               ),
             ),

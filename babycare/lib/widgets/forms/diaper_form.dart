@@ -19,6 +19,7 @@ class DiaperForm extends StatefulWidget {
 class _DiaperFormState extends State<DiaperForm> {
   String diaperType = DiaperTypes.pee;
   bool hasRash = false;
+  DateTime selectedDateTime = DateTime.now();
   final _notesController = TextEditingController();
 
   @override
@@ -40,6 +41,7 @@ class _DiaperFormState extends State<DiaperForm> {
     widget.onSubmit(
       activityType: ActivityTypes.diaper,
       metadata: metadata,
+      startTime: selectedDateTime,
     );
   }
 
@@ -106,8 +108,41 @@ class _DiaperFormState extends State<DiaperForm> {
                 ),
                 CupertinoSwitch(
                   value: hasRash,
-                  activeColor: const Color(0xFFFF6B6B),
+                  activeTrackColor: const Color(0xFFFF6B6B),
                   onChanged: (value) => setState(() => hasRash = value),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+
+          // Date & Time Picker
+          const Text('Date & Time', style: AppTypography.h3),
+          const SizedBox(height: AppSpacing.sm),
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            decoration: BoxDecoration(
+              color: CupertinoColors.white,
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              boxShadow: AppShadows.sm,
+            ),
+            child: Column(
+              children: [
+                Text(
+                  '${selectedDateTime.day}/${selectedDateTime.month}/${selectedDateTime.year} ${selectedDateTime.hour}:${selectedDateTime.minute.toString().padLeft(2, '0')}',
+                  style: AppTypography.body.copyWith(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                SizedBox(
+                  height: 150,
+                  child: CupertinoDatePicker(
+                    mode: CupertinoDatePickerMode.dateAndTime,
+                    initialDateTime: selectedDateTime,
+                    maximumDate: DateTime.now(),
+                    onDateTimeChanged: (newDateTime) {
+                      setState(() => selectedDateTime = newDateTime);
+                    },
+                  ),
                 ),
               ],
             ),
