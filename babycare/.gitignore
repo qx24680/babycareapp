@@ -10,6 +10,7 @@
 .history
 .svn/
 .swiftpm/
+.env
 migrate_working_dir/
 
 # IntelliJ related
@@ -43,3 +44,12 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+
+# Firebase generated options
+lib/firebase_options.dart
+
+# Firebase implementation
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+macos/Runner/GoogleService-Info.plist
